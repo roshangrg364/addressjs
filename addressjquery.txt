@@ -1,0 +1,55 @@
+  $(".province-dropdown").on('change', function (e) {
+                e.preventDefault();
+                var province_id = $(".province-dropdown").val();
+                var url = `/AddressDropdown/GetDistrict?provinceId=${province_id}`;
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (response, status) {
+                        $('.district-dropdown > option').remove();
+                        for (var i = 0; i < response.data.length; i++) {
+                            $(".district-dropdown").append("<option value = '" + response.data[i].DistrictId + " '>" + response.data[i].DistrictName + " </option>");
+                        }
+                       $(".district-dropdown").trigger("change");
+                    }
+                });
+            });
+
+            $(".district-dropdown").change(function (e) {
+                e.preventDefault();
+                var district_id = $(".district-dropdown").val();
+                var url = `/AddressDropdown/GetVdc?districtId=${district_id}`;
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (data, status) {
+                        
+
+                        $('.vdc-dropdown > option').remove();
+                        for (var i = 0; i < data.data.length; i++) {
+                            $(".vdc-dropdown").append("<option value = " + data.data[i].VdcId + ">" + data.data[i].VdcName + " </option>");
+                        }
+                        $(".vdc-dropdown").trigger("change");
+                    }
+                });
+            });
+
+            $(".vdc-dropdown").change(function (e) {
+                e.preventDefault();
+                var vdc_id = $(".vdc-dropdown").val();
+                var url = `/AddressDropdown/GetWard?vdcId=${vdc_id}`;
+                $.ajax({
+                    url: url,
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (response, status) {
+                        console.log(response);
+                        $('.ward-dropdown > option').remove();
+                        for (var i = 0; i < response.data.length; i++) {
+                            $(".ward-dropdown").append("<option value = '" + response.data[i].WardId + " '>" + response.data[i].WardName + " </option>");
+                        }
+                    }
+                });
+            });

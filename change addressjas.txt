@@ -1,0 +1,105 @@
+ let addressJs = {
+                provinceElmId: ".province-dropdown",
+                defaultProvinceId:@Model.ProvinceId??0,
+                districtElmId: ".district-dropdown",
+                defaultDistrictId: @Model.DistrictId,
+                vdcElmId: ".vdc-dropdown",
+                defaultVdcId:  @Model.VdcId,
+                wardElmId: ".ward-dropdown",
+                defaultWardId:  @Model.WardId,
+            }
+            AddressJs(addressJs);
+            function AddressJs({ provinceElmId, defaultProvinceId, districtElmId, defaultDistrictId, vdcElmId, defaultVdcId, wardElmId, defaultWardId }) {
+
+                const PROVINCE_URL = "/provinces/";
+                const DISTRICT_URL = "/districts/";
+                const VDC_URL = "/vdc/";
+                const WARD_URL = "/ward/";
+
+
+                let provinceElm = document.querySelector(provinceElmId);
+                let districtElm = document.querySelector(districtElmId);
+                let vdcElm = document.querySelector(vdcElmId);
+                let wardElm = document.querySelector(wardElmId);
+
+                changeProvince();
+
+
+
+
+                provinceElm.addEventListener('change', changeProvince);
+
+                districtElm.addEventListener('change', changeDistrict);
+
+                vdcElm.addEventListener('change', changeVdc);
+
+
+                function changeProvince() {
+                    if (!provinceElm.querySelector('option')) {
+                        fetchProvinces();
+                    }
+                    let provinceId = provinceElm.value;
+                    let href = DISTRICT_URL + provinceId;
+                    fetch(href).then(resp => resp.json()).then(data => {
+                        let districtsData = data.data;
+                        addOptions(districtElm, districtsData, "DistrictId", "DistrictName", defaultDistrictId);
+
+                    });
+                }
+
+                function changeDistrict() {
+                    let districtId = districtElm.value;
+                    let href = VDC_URL + districtId;
+
+                    fetch(href).then(resp => resp.json()).then(data => {
+                        let vdcsData = data.data;
+
+                        addOptions(vdcElm, vdcsData, "VdcId", "VdcName", defaultVdcId);
+
+                    });
+                }
+
+                function changeVdc() {
+                    let vdcId = vdcElm.value;
+                    let href = WARD_URL + vdcId;
+
+                    fetch(href).then(resp => resp.json()).then(data => {
+                        let wardsData = data.data;
+                        addOptions(wardElm, wardsData, "WardId", "WardName", defaultWardId);
+                    });
+                }
+
+                function fetchProvinces() {
+                    fetch(PROVINCE_URL).then(resp => resp.json()).then(data => {
+                        let provinceData = data.data;
+                        addOptions(provinceElm, provinceData, "ProvinceId", "Name", defaultProvinceId);
+                    });
+                }
+
+
+
+
+            }
+
+
+            function addOptions(selectElm, optionsArrayObj, valueId, valueName, selectedId = 0) {
+                let selectElmId = selectElm.id;
+                $(`#${selectElmId} option`).remove();
+
+                optionsArrayObj.forEach(function (option) {
+                    let id = option[valueId];
+                    let name = option[valueName];
+                    let optionElm = document.createElement('option');
+                    optionElm.value = id;
+                    if (id == selectedId) { optionElm.selected = true; console.log("selected"); }
+
+                    optionElm.appendChild(document.createTextNode(name));
+
+                    selectElm.appendChild(optionElm);
+
+                });
+                let event = new Event('change');
+
+                // Dispatch it.
+                selectElm.dispatchEvent(event);
+            }te file
